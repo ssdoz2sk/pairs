@@ -141,7 +141,7 @@
                   />
                 </td>
 
-                <td class="text-xs-left" v-if="!quickEditGirls">{{ props.item.detail }}</td>
+                <!-- <td class="text-xs-left" v-if="!quickEditGirls">{{ props.item.detail }}</td>
                 <td v-else>
                   <v-text-field
                     placeholder="詳細"
@@ -149,7 +149,7 @@
                     @focus="addElementWhenLastFocus(girls, props.index)"
                     single-line
                   />
-                </td>
+                </td> -->
 
                 <td class="text-xs-left" v-if="!quickEditGirlsPair && !showSelectName">{{ props.item.select }}</td>
                 <td class="text-xs-left" v-else-if="!quickEditGirlsPair">
