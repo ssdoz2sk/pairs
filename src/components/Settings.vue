@@ -8,10 +8,18 @@
       <v-spacer></v-spacer>
       <v-toolbar-items>
         <v-btn dark flat @click.native="save">Save</v-btn>
+        <v-btn dark flat @click.native="$store.commit('closeSettingModal')">Close</v-btn>
       </v-toolbar-items>
     </v-toolbar>
     <v-card-text>
       <v-container grid-list-md text-xs-center>
+        <v-layout row wrap>
+          <v-flex xs12>
+            <v-alert dismissible type="error" v-model='showErrorMessage'>
+              {{errorMessage}}
+            </v-alert>
+          </v-flex>
+        </v-layout>
         <v-layout row wrap>
           <v-flex xs12>
             <v-text-field
@@ -21,12 +29,19 @@
             ></v-text-field>
           </v-flex>
         </v-layout>
+        
+        <v-layout row wrap>
+          <v-flex xs12>
+            <v-btn block v-bind:class="[showSelectName ? 'orange lighten-1 theme--dark': '' ]" @click="showSelectName = !showSelectName">在設定顯示配對意象姓名</v-btn>
+          </v-flex>
+        </v-layout>
+
         <v-layout row wrap v-if="boys.length > 0 && girls.length > 0">
           <v-flex xs6>
-            <v-btn block color="blue lighten-2" @click="quickPair('boys')">男生 輸入配對意象</v-btn>
+            <v-btn block color="blue lighten-2" v-bind:class="{'btn--round': quickEditBoysPair}" @click="quickPair('boys')">男生 輸入配對意象</v-btn>
           </v-flex>
           <v-flex xs6>
-            <v-btn block color="pink lighten-2" @click="quickPair('girls')">女生 輸入配對意象</v-btn>
+            <v-btn block color="pink lighten-2" v-bind:class="{'btn--round': quickEditGirlsPair}" @click="quickPair('girls')">女生 輸入配對意象</v-btn>
           </v-flex>
         </v-layout>
         <v-layout row wrap>
@@ -66,7 +81,7 @@
                   />
                 </td>
 
-                <td class="text-xs-left" v-if="!quickEditBoys">{{ props.item.detail }}</td>
+                <!-- <td class="text-xs-left" v-if="!quickEditBoys">{{ props.item.detail }}</td>
                 <td v-else>
                   <v-text-field
                     placeholder="詳細"
@@ -74,9 +89,18 @@
                     @focus="addElementWhenLastFocus(boys, props.index)"
                     single-line
                   />
-                </td>
+                </td> -->
 
-                <td class="text-xs-left" v-if="!quickEditBoysPair">{{ props.item.select }}</td>
+                <td class="text-xs-left" v-if="!quickEditBoysPair && !showSelectName">{{ props.item.select }}</td>
+                <td class="text-xs-left" v-else-if="!quickEditBoysPair">
+                  <v-list v-if="props.item.selectPerson">
+                    <v-list-tile v-for="person in props.item.selectPerson" :key="person.id">
+                      <v-list-tile-content v-bind:class="{'text-red': person.noFound}">
+                        <v-list-tile-title>{{ person.id }}. {{ person.name }}</v-list-tile-title>
+                      </v-list-tile-content>
+                    </v-list-tile>
+                  </v-list>
+                </td>
                 <td v-else><v-text-field placeholder="配對意象，以空白格開" v-model="props.item.select" single-line /></td>
               </template>
             </v-data-table>
@@ -127,7 +151,16 @@
                   />
                 </td>
 
-                <td class="text-xs-left" v-if="!quickEditGirlsPair">{{ props.item.select }}</td>
+                <td class="text-xs-left" v-if="!quickEditGirlsPair && !showSelectName">{{ props.item.select }}</td>
+                <td class="text-xs-left" v-else-if="!quickEditGirlsPair">
+                  <v-list v-if="props.item.selectPerson">
+                    <v-list-tile v-for="person in props.item.selectPerson" :key="person.id">
+                      <v-list-tile-content v-bind:class="{'text-red': person.noFound}">
+                        <v-list-tile-title>{{ person.id }}. {{ person.name }}</v-list-tile-title>
+                      </v-list-tile-content>
+                    </v-list-tile>
+                  </v-list>
+                </td>
                 <td v-else><v-text-field placeholder="配對意象，以空白格開" v-model="props.item.select" single-line /></td>
               </template>
             </v-data-table>
@@ -135,10 +168,10 @@
         </v-layout>
         <v-layout row wrap>
           <v-flex xs6>
-            <v-btn block dark color="blue lighten-2" @click="quickEdit('boys')">男生 輸入/修改 名單</v-btn>
+            <v-btn block dark color="blue lighten-2" v-bind:class="{'btn--round': quickEditBoys}" @click="quickEdit('boys')">男生 輸入/修改 名單</v-btn>
           </v-flex>
           <v-flex xs6>
-            <v-btn block dark color="pink lighten-2" @click="quickEdit('girls')">女生 輸入/修改 名單</v-btn>
+            <v-btn block dark color="pink lighten-2" v-bind:class="{'btn--round': quickEditGirls}" @click="quickEdit('girls')">女生 輸入/修改 名單</v-btn>
           </v-flex>
         </v-layout>
         <v-layout row wrap>
@@ -187,17 +220,20 @@ export default {
           value: 'id'
         },
         { text: '姓名', value: 'name' },
-        { text: '詳細', value: 'detail' },
+        // { text: '詳細', value: 'detail' },
         { text: '選擇', value: 'select' }
       ],
       boys: [],
       girls: [],
       matched: [],
+      showSelectName: false,
       quickEditBoys: false,
       quickEditGirls: false,
       quickEditBoysPair: false,
       quickEditGirlsPair: false,
-      editParticipant: false
+      editParticipant: false,
+      errorMessage: '',
+      showErrorMessage: false
     }
   },
   methods: {
@@ -240,6 +276,7 @@ export default {
                list[list.length - 1].select === '') {
           list.pop()
         }
+        this.reloadSelectName()
       } else {
         list.push({
           id: '',
@@ -250,12 +287,43 @@ export default {
       }
     },
 
+    reloadSelectName () {
+      for (let boy of this.boys) {
+        let selects = boy.select.split(' ') || []
+        boy.selectPerson = []
+
+        for (let selectGirlId of selects) {
+          let girl = this.girls.find(g => g.id === selectGirlId)
+          if (girl) {
+            boy.selectPerson.push({'id': girl.id, 'name': girl.name})
+          } else {
+            boy.selectPerson.push({'id': selectGirlId, 'name': '查無此人', 'noFound': true})
+          }
+        }
+      }
+
+      for (let girl of this.girls) {
+        let selects = girl.select.split(' ') || []
+        girl.selectPerson = []
+
+        for (let selectBoyId of selects) {
+          let boy = this.boys.find(b => b.id === selectBoyId)
+          if (boy) {
+            girl.selectPerson.push({'id': boy.id, 'name': boy.name})
+          } else {
+            girl.selectPerson.push({'id': selectBoyId, 'name': '查無此人', 'noFound': true})
+          }
+        }
+      }
+    },
+
     quickPair (listname) {
       if (listname === 'boys') {
         this.quickEditBoysPair = !this.quickEditBoysPair
       } else if (listname === 'girls') {
         this.quickEditGirlsPair = !this.quickEditGirlsPair
       }
+      this.reloadSelectName()
     },
 
     deleteItem (list, index) {
@@ -267,9 +335,15 @@ export default {
       this.$store.commit('girls', this.girls)
       this.$store.commit('title', this.title)
       this.$store.commit('closeSettingModal')
+      this.$store.commit('showSelectName', this.showSelectName)
       document.title = this.title
 
-      let dataString = JSON.stringify({boys: this.boys, girls: this.girls, title: this.title})
+      let dataString = JSON.stringify({
+        boys: this.boys,
+        girls: this.girls,
+        title: this.title,
+        showSelectName: this.showSelectName
+      })
       localStorage.setItem('data', dataString)
     },
 
@@ -291,6 +365,10 @@ export default {
             this.title = data['title'] || ''
           } catch (e) {
             this.errorMessage = '資料解析錯誤，請確定是正確檔案'
+            this.showErrorMessage = true
+            setTimeout(() => {
+              this.showErrorMessage = false
+            }, 5000)
           }
         })
       }
@@ -318,6 +396,8 @@ export default {
         this.boys = _.cloneDeep(this.$store.state.boys)
         this.girls = _.cloneDeep(this.$store.state.girls)
         this.title = this.$store.state.title
+        this.showSelectName = this.$store.state.showSelectName
+        this.reloadSelectName()
       }
     }
   },
@@ -327,8 +407,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.participant-card {
-  margin-bottom: 1.2rem;
-  box-shadow: 4px 4px 7px 3px #ddd;
+.text-red {
+  color: red;
 }
 </style>

@@ -68,12 +68,14 @@ export default {
     let boys = data['boys'] || []
     let girls = data['girls'] || []
     let title = data['title'] || '標題喔~~'
+    let showSelectName = data['showSelectName'] || false
 
     document.title = title
 
     this.$store.commit('boys', boys)
     this.$store.commit('girls', girls)
     this.$store.commit('title', title)
+    this.$store.commit('showSelectName', showSelectName)
   }
 }
 </script>

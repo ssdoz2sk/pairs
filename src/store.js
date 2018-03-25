@@ -7,6 +7,7 @@ export default new Vuex.Store({
   strict: true,
   state: {
     settingModal: false,
+    showSelectName: false,
     girls: [],
     boys: [],
     title: ''
@@ -28,6 +29,9 @@ export default new Vuex.Store({
     },
     title (state, title) {
       state.title = title
+    },
+    showSelectName (state, showSelectName) {
+      state.showSelectName = showSelectName
     }
   },
   actions: {
