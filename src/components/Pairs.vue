@@ -10,11 +10,12 @@
           <v-list two-line>
             <v-list-tile avatar>
               <v-list-tile-avatar>
-                <img :src="boy.avatar" >
+                <img v-if="boy.avatar" :src="boy.avatar" >
+                <v-icon v-else large color="blue darken-2">person</v-icon>
               </v-list-tile-avatar>
               <v-list-tile-content>
-                <v-list-tile-title v-html="boy.name"></v-list-tile-title>
-                <v-list-tile-sub-title v-html="boy.detail"></v-list-tile-sub-title>
+                <v-list-tile-title>{{ boy.id }}. {{ boy.name }}</v-list-tile-title>
+                <v-list-tile-sub-title>{{ boy.detail }}</v-list-tile-sub-title>
               </v-list-tile-content>
             </v-list-tile>
           </v-list>
@@ -31,11 +32,12 @@
               <v-list two-line>
                 <v-list-tile avatar>
                   <v-list-tile-avatar>
-                    <img :src="match.boy.avatar" >
+                    <img v-if="match.boy.avatar" :src="match.boy.avatar" >
+                    <v-icon v-else large color="blue darken-2">person</v-icon>
                   </v-list-tile-avatar>
                   <v-list-tile-content>
-                    <v-list-tile-title v-html="match.boy.name"></v-list-tile-title>
-                    <v-list-tile-sub-title v-html="match.boy.detail"></v-list-tile-sub-title>
+                    <v-list-tile-title>{{ match.boy.id }}. {{ match.boy.name }}</v-list-tile-title>
+                    <v-list-tile-sub-title> {{ match.boy.detail }}</v-list-tile-sub-title>
                   </v-list-tile-content>
                 </v-list-tile>
               </v-list>
@@ -46,11 +48,12 @@
               <v-list two-line>
                 <v-list-tile avatar>
                   <v-list-tile-avatar>
-                    <img :src="match.girl.avatar" >
+                    <img v-if="match.girl.avatar" :src="match.girl.avatar" >
+                    <v-icon v-else large color="pink darken-2">person</v-icon>
                   </v-list-tile-avatar>
                   <v-list-tile-content>
-                    <v-list-tile-title v-html="match.girl.name"></v-list-tile-title>
-                    <v-list-tile-sub-title v-html="match.girl.detail"></v-list-tile-sub-title>
+                    <v-list-tile-title>{{ match.girl.id }}. {{ match.girl.name }}</v-list-tile-title>
+                    <v-list-tile-sub-title> {{ match.girl.detail }}</v-list-tile-sub-title>
                   </v-list-tile-content>
                 </v-list-tile>
               </v-list>
@@ -67,11 +70,12 @@
           <v-list two-line>
             <v-list-tile avatar>
               <v-list-tile-avatar>
-                <img :src="girl.avatar" >
+                <img v-if="girl.avatar" :src="girl.avatar" >
+                <v-icon v-else large color="pink darken-2">person</v-icon>
               </v-list-tile-avatar>
               <v-list-tile-content>
-                <v-list-tile-title v-html="girl.name"></v-list-tile-title>
-                <v-list-tile-sub-title v-html="girl.detail"></v-list-tile-sub-title>
+                <v-list-tile-title>{{ girl.id }}. {{ girl.name }}</v-list-tile-title>
+                <v-list-tile-sub-title>{{ girl.detail }}</v-list-tile-sub-title>
               </v-list-tile-content>
             </v-list-tile>
           </v-list>
